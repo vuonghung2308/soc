@@ -1,64 +1,56 @@
 package com.mh.soc.vo.request;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @ToString
 @AllArgsConstructor
 public class SendMailRequest {
-    public ArrayList<Personalization> personalizations;
-    public ArrayList<Content> content;
-    public String subject;
-    public From from;
+    private List<Message> Messages;
 
     @Getter
     @ToString
-    @AllArgsConstructor
-    public static class Content {
-        private final String type = "text/plain";
-        private final String value;
+    public static class Message {
+        private final String Subject;
+        private final String HTMLPart;
+        private final List<Address> To;
+        private final Address From;
+
+        public Message(
+                String subject, String msg1, String msg2,
+                Address from, Address to
+        ) {
+            this.Subject = subject;
+            this.HTMLPart = "<h3>" + msg1 + "</h3><br/>" + msg2;
+            this.To = List.of(to);
+            this.From = from;
+        }
     }
 
     @Getter
+    @Builder
     @ToString
-    @AllArgsConstructor
-    public static class From {
-        private String email;
-        private String name;
-    }
-
-    @Getter
-    @ToString
-    @AllArgsConstructor
-    public static class To {
-        private String email;
-    }
-
-    @Getter
-    @ToString
-    @AllArgsConstructor
-    public static class Personalization {
-        private ArrayList<To> to;
+    public static class Address {
+        private final String Name;
+        private final String Email;
     }
 
     public static SendMailRequest getInstance(
-            String from, String name, String to,
-            String subject, String message
+            String from, String name,
+            String to, String subject,
+            String msg1, String msg2
     ) {
-        To t = new To(to);
-        Personalization p = new Personalization(
-                new ArrayList<>(List.of(t)));
-        Content c = new Content(message);
-        From f = new From(from, name);
-        return new SendMailRequest(
-                new ArrayList<>(List.of(p)),
-                new ArrayList<>(List.of(c)),
-                subject, f
-        );
+        Address aF = Address.builder()
+                .Email(from).Name(name)
+                .build();
+        Address aT = Address.builder()
+                .Email(to).build();
+        Message msg = new Message(subject, msg1, msg2, aF, aT);
+        return new SendMailRequest(List.of(msg));
     }
 }

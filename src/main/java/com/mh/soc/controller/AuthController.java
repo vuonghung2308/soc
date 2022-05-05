@@ -125,7 +125,7 @@ public class AuthController {
         if (!user.getCode().equals(body.getCode())) {
             throw new CustomException(
                     "INVALID_CODE",
-                    "your code is invalid"
+                    "your code is incorrect"
             );
         }
 
