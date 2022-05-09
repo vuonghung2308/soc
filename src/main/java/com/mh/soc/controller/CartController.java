@@ -9,7 +9,7 @@ import com.mh.soc.repository.BookRepository;
 import com.mh.soc.repository.CartRepository;
 import com.mh.soc.repository.ItemRepository;
 import com.mh.soc.repository.UserRepository;
-import com.mh.soc.vo.request.AddBookRequest;
+import com.mh.soc.vo.request.AddToCartRequest;
 import com.mh.soc.vo.response.CartResponse;
 import com.mh.soc.vo.response.ResponseMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,19 +17,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/cart")
 public class CartController {
     @Autowired
-    CartRepository cartRepository;
+    private CartRepository cartRepo;
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepo;
     @Autowired
-    BookRepository bookRepository;
+    private BookRepository bookRepo;
     @Autowired
-    ItemRepository itemRepository;
+    private ItemRepository itemRepo;
 
     @GetMapping("")
     public ResponseEntity<?> get(HttpServletRequest request) {
@@ -37,51 +37,59 @@ public class CartController {
         if (user.getCart() == null) {
             throw new CustomException(
                     "CART_IS_EMPTY",
-                    "gio hang rong"
+                    "Your cart is empty"
             );
         } else {
-            CartResponse cartResponse = new CartResponse(user.getCart());
+            Optional<Cart> cart = cartRepo.findById(user.getCart().getId());
+            CartResponse cartResponse = new CartResponse(cart.get());
             return ResponseEntity.ok(cartResponse);
         }
 
     }
 
     @PostMapping("add")
-    public ResponseEntity<?> add(HttpServletRequest request, @RequestBody AddBookRequest body) {
-        Book book = bookRepository.findById(body.getBookId()).orElseThrow(() -> new CustomException(
-                "INVALID_EMAIL",
-                "your email is incorrect")
-        );
-        Cart cart = new Cart();
-        Item item = new Item();
-        item.setQuantity(body.getQuantity());
-        item.setBook(book);
-        Long userId = (Long) request.getAttribute("user");
-        User user = userRepository.findById(Long.valueOf(userId)).orElseThrow(() -> new CustomException(
-                "INVALID_EMAIL",
-                "your email is incorrect")
-        );
-        if(user.getCart() == null){
-            itemRepository.save(item);
-            cartRepository.save(cart);
+    public ResponseEntity<?> add(
+            HttpServletRequest request,
+            @RequestBody AddToCartRequest body
+    ) {
+        Book book = bookRepo.findById(body.getBookId())
+                .orElseThrow(() -> new CustomException(
+                        "BOOK_NOT_EXIST",
+                        "Book has id: " + body.getBookId() + " is not exist")
+                );
+        User user = (User) request.getAttribute("user");
+
+        if (user.getCart() == null) {
+            Item item = new Item(book, body.getQuantity());
+            Cart cart = new Cart(item);
+            itemRepo.save(item);
+            cartRepo.save(cart);
             user.setCart(cart);
-            userRepository.save(user);
+            userRepo.save(user);
             ResponseMessage message = new ResponseMessage(
-                    "SUCCESSFUL_REGISTRATION",
-                    "successful registration, check your email for verification code"
+                    "ADD_TO_CART_SUCCESSFULLY",
+                    "Add book to cart successfully"
             );
             return ResponseEntity.ok(message);
-        }else{
-            List<Item> list = user.getCart().getItems();
-            for(Item i : list){
-                if(i.getBook().getId() == body.getBookId()){
-                    i.setQuantity(i.getQuantity()+ body.getQuantity());
+        } else {
+            Optional<Cart> cart = cartRepo.findById(user.getCart().getId());
+            boolean hasItem = false;
+            for (Item item : cart.get().getItem()) {
+                if (item.getBook().getId() == body.getBookId()) {
+                    hasItem = true;
+                    item.setQuantity(item.getQuantity() + body.getQuantity());
+                    itemRepo.save(item);
                 }
             }
-            cartRepository.save(user.getCart());
+            if (!hasItem) {
+                Item item = new Item(book, body.getQuantity());
+                itemRepo.save(item);
+                cart.get().getItem().add(item);
+            }
+            cartRepo.save(cart.get());
             ResponseMessage message = new ResponseMessage(
-                    "SUCCESSFUL_REGISTRATION",
-                    "successful registration, check your email for verification code"
+                    "ADD_TO_CART_SUCCESSFULLY",
+                    "Add book to cart successfully"
             );
             return ResponseEntity.ok(message);
         }

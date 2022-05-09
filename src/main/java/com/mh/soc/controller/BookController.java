@@ -23,7 +23,6 @@ public class BookController {
     @Autowired
     private BookRepository repository;
 
-
     @GetMapping("base")
     public ResponseEntity<?> get() {
         List<Book> list = repository.findAll();

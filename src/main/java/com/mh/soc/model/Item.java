@@ -1,4 +1,5 @@
 package com.mh.soc.model;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,8 +10,8 @@ import javax.persistence.*;
 @Entity
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "item")
 public class Item {
     @Id
@@ -20,4 +21,8 @@ public class Item {
     private Book book;
     private Integer quantity;
 
+    public Item(Book book, Integer quantity) {
+        this.quantity = quantity;
+        this.book = book;
+    }
 }

@@ -8,14 +8,18 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "cart")
 public class Cart {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToMany
-    private List<Item> items;
+    private List<Item> item;
+
+    public Cart(Item... items) {
+        this.item = List.of(items);
+    }
 }

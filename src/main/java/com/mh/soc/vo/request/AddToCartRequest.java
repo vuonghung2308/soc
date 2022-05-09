@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class VerifyRequest {
-    private String email;
-    private String code;
+public class AddToCartRequest {
+    private Long bookId;
+    private Integer quantity;
 }

@@ -10,9 +10,9 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "book")
 public class Book implements Serializable {
     @Id
