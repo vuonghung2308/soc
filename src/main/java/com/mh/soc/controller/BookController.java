@@ -1,10 +1,13 @@
 package com.mh.soc.controller;
 
+
+
 import com.mh.soc.model.Book;
 import com.mh.soc.repository.BookRepository;
 import com.mh.soc.vo.response.BaseBookResponse;
 import com.mh.soc.vo.response.BookResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,11 +16,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+
 @RestController
 @RequestMapping("/api/books")
 public class BookController {
     @Autowired
-    BookRepository repository;
+    private BookRepository repository;
+
 
     @GetMapping("base")
     public ResponseEntity<?> get() {
@@ -65,4 +70,15 @@ public class BookController {
         return ResponseEntity.ok(BookResponse.get(list.subList(
                 0, Math.min(limit, list.size()))));
     }
+
+    @GetMapping("search")
+    public ResponseEntity<List<Book>> getBookByName(@RequestParam String name) {
+        return new ResponseEntity<List<Book>>(repository.searchBookByNameContaining(name), HttpStatus.OK);
+    }
+
+//    @GetMapping("123")
+//    public ResponseEntity<Book> getBookById(@RequestParam Long id){
+//        return new ResponseEntity<Book>(repository.findBookById(id), HttpStatus.OK);
+//    }
+
 }
