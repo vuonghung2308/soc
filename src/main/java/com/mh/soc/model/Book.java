@@ -26,6 +26,7 @@ public class Book {
     private Long price;
     private Date date;
     private String image;
+    private String author;
 
     public Float getStar() {
         if (rating.isEmpty()) {

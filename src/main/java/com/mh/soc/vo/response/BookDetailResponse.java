@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-public class BookResponse {
+public class BookDetailResponse {
     private final Long id;
     private final String name;
     private final String description;
@@ -25,7 +25,7 @@ public class BookResponse {
     private static final SimpleDateFormat f =
             new SimpleDateFormat("yyyy-MM-dd");
 
-    public BookResponse(Book b) {
+    public BookDetailResponse(Book b) {
         category = new CategoryResponse(b.getCategory());
         ratings = RatingResponse.get(b.getRating());
         numberOfPage = b.getNumberOfPage();
