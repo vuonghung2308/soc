@@ -34,7 +34,7 @@ public class AuthInterceptor implements HandlerInterceptor {
                             "your token is invalid")
                     );
 
-            request.setAttribute("user_id", user.getId());
+            request.setAttribute("user", user.getId());
             return true;
         } else {
             throw new CustomException(

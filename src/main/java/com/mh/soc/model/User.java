@@ -1,15 +1,13 @@
 package com.mh.soc.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.Date;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -37,6 +35,9 @@ public class User {
 
     private String code;
     private Date time;
+
+    @OneToOne
+    private Cart cart;
 
     public boolean isCodeValid() {
         long duration = 5 * 60 * 1000;

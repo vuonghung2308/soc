@@ -30,7 +30,7 @@ public class Application implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
 //        registry.addInterceptor(loggingInterceptor);
         registry.addInterceptor(interceptor)
-                .addPathPatterns("/api/test/**");
+                .addPathPatterns("/api/cart/**");
     }
 
     @Override

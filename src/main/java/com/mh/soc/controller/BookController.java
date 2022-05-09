@@ -16,14 +16,16 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.Optional;
 
+
 @RestController
 @RequestMapping("/api/books")
 public class BookController {
     @Autowired
-    BookRepository repository;
+    private BookRepository repository;
+
 
     @GetMapping("base")
-    public ResponseEntity<?> topSale() {
+    public ResponseEntity<?> get() {
         List<Book> list = repository.findAll();
 
         BaseBookResponse base = new BaseBookResponse();
@@ -60,7 +62,6 @@ public class BookController {
 
     @GetMapping("top-new")
     public ResponseEntity<?> topNew(
-            @HttpServletRequest request
             @RequestParam(defaultValue = "100", required = false) Integer limit
     ) {
         List<Book> list = repository.findAll();
