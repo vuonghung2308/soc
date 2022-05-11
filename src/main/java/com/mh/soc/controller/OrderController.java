@@ -9,7 +9,9 @@ import com.mh.soc.repository.CartRepository;
 import com.mh.soc.repository.OrderRepository;
 import com.mh.soc.repository.ShipmentRepository;
 import com.mh.soc.repository.UserRepository;
+import com.mh.soc.utils.MailService;
 import com.mh.soc.vo.request.MakeOrderRequest;
+import com.mh.soc.vo.request.UpdateOrderRequest;
 import com.mh.soc.vo.response.OrderDetailResponse;
 import com.mh.soc.vo.response.OrderResponse;
 import com.mh.soc.vo.response.ResponseMessage;
@@ -33,6 +35,8 @@ public class OrderController {
     private ShipmentRepository shipmentRepo;
     @Autowired
     private UserRepository userRepo;
+    @Autowired
+    private MailService service;
 
     @PostMapping("make")
     public ResponseEntity<?> makeOrder(
@@ -112,6 +116,34 @@ public class OrderController {
             }
         }
 
+    }
+
+    @PostMapping("update")
+    public ResponseEntity<?> update(
+            @RequestBody UpdateOrderRequest body,
+            HttpServletRequest request
+    ) {
+        User user = (User) request.getAttribute("user");
+        if (user.getRole() == User.Role.CUSTOMER && body.getStatus() != Order.Status.CANCELED) {
+            throw new CustomException(
+                    "ACTION_NOT_ALLOWED",
+                    "Your action is not allowed"
+            );
+        }
+        Order order = orderRepo.findById(body.getId())
+                .orElseThrow(() -> new CustomException(
+                        "ORDER_NOT_FOUND",
+                        "Can not find order has id: " + body.getId())
+                );
+        User client = userRepo.getById(orderRepo.getUserId(order.getId()));
+        order.setStatus(body.getStatus());
+        service.sendOrderInfo(order, user, client);
+        orderRepo.save(order);
+        ResponseMessage message = new ResponseMessage(
+                "UPDATE_ORDER_SUCCESSFULLY",
+                "You update order successfully"
+        );
+        return ResponseEntity.ok(message);
     }
 
     private List<Order> getOrders(Long userId) {

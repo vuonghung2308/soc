@@ -3,6 +3,7 @@ package com.mh.soc.model;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor
 @Table(name = "`order`")
 public class Order {
@@ -29,7 +31,7 @@ public class Order {
 
 
     public enum Status {
-        INITIATED, CONFIRMED, SHIPPED
+        INITIATED, CONFIRMED, SHIPPED, CANCELED
     }
 
     public Order(Cart cart, Shipment shipment) {

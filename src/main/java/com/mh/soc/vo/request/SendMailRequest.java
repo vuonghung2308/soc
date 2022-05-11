@@ -26,7 +26,7 @@ public class SendMailRequest {
                 Address from, Address to
         ) {
             this.Subject = subject;
-            this.HTMLPart = "<h3>" + msg1 + "</h3><br/>" + msg2;
+            this.HTMLPart = "<h3>" + msg1 + "</h3><p>" + msg2 + "</p>";
             this.To = List.of(to);
             this.From = from;
         }

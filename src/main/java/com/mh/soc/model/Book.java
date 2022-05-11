@@ -3,14 +3,15 @@ package com.mh.soc.model;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "book")
@@ -35,6 +36,27 @@ public class Book {
     private Date date;
     private String image;
     private String author;
+
+    public Book(
+            String name, String description,
+            Integer numberOfPage, String publisher,
+            Category category, Long total,
+            Integer sold, Long price,
+            Date date, String image,
+            String author
+    ) {
+        this.name = name;
+        this.description = description;
+        this.numberOfPage = numberOfPage;
+        this.publisher = publisher;
+        this.category = category;
+        this.total = total;
+        this.sold = sold;
+        this.price = price;
+        this.date = date;
+        this.image = image;
+        this.author = author;
+    }
 
     public Float getStar() {
         if (rating.isEmpty()) {

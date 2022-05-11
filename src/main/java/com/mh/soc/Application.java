@@ -25,8 +25,14 @@ public class Application implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-//        registry.addInterceptor(loggingInterceptor);
         registry.addInterceptor(interceptor)
+                .addPathPatterns("/api/category/create")
+                .addPathPatterns("/api/category/update")
+                .addPathPatterns("/api/category/delete")
+                .addPathPatterns("/api/book/create")
+                .addPathPatterns("/api/book/update")
+                .addPathPatterns("/api/book/delete")
+                .addPathPatterns("/api/order/update")
                 .addPathPatterns("/api/order/**")
                 .addPathPatterns("/api/cart/**");
     }
