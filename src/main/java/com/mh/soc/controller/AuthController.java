@@ -52,7 +52,8 @@ public class AuthController {
             SignInResponse response = SignInResponse.builder()
                     .id(user.getId()).username(user.getUsername())
                     .email(user.getEmail()).role(user.getRole())
-                    .token(token).build();
+                    .token(token).fullname(user.getFullname())
+                    .build();
             return ResponseEntity.ok(response);
         } else {
             throw new CustomException(

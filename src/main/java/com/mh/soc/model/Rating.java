@@ -13,7 +13,10 @@ public class Rating {
     private Long id;
 
     private Integer star;
+
+    @Column(columnDefinition = "LONGTEXT")
     private String comment;
+
     @ManyToOne
     private User user;
 }

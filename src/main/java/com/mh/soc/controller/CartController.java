@@ -10,6 +10,7 @@ import com.mh.soc.repository.CartRepository;
 import com.mh.soc.repository.ItemRepository;
 import com.mh.soc.repository.UserRepository;
 import com.mh.soc.vo.request.AddToCartRequest;
+import com.mh.soc.vo.request.RemoveRequest;
 import com.mh.soc.vo.response.CartResponse;
 import com.mh.soc.vo.response.ResponseMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -44,7 +46,6 @@ public class CartController {
             CartResponse cartResponse = new CartResponse(cart.get());
             return ResponseEntity.ok(cartResponse);
         }
-
     }
 
     @PostMapping("add")
@@ -94,20 +95,50 @@ public class CartController {
             return ResponseEntity.ok(message);
         }
     }
-//    @PostMapping("remove/{bookId}")
-//    public String remove(@PathVariable("bookId") long bookId){
-//        cartService.remove(bookId);
-//        return"redircect:/api/cart/list";
-//    }
-//    @PostMapping("update")
-//    public String update(@RequestParam("bookId") long bookId, @RequestParam("quantity") Integer quantity){
-//        cartService.update(bookId,quantity);
-//        return "redircect:/api/cart/list";
-//        }
-//        @GetMapping("clear")
-//        public String clear(){
-//        return "redircect:/api/cart/list";
-//        }
 
+    @PostMapping("clear")
+    public ResponseEntity<?> clear(HttpServletRequest request) {
+        User user = (User) request.getAttribute("user");
+        if (user.getCart() == null) {
+            ResponseMessage message = new ResponseMessage(
+                    "CLEAR_CART_SUCCESSFULLY",
+                    "Clear your cart successfully"
+            );
+            return ResponseEntity.ok(message);
+        }
+        Optional<Cart> cart = cartRepo.findById(user.getCart().getId());
+        if (cart.isPresent()) {
+            cart.get().getItem().clear();
+            cartRepo.save(cart.get());
+        }
+        ResponseMessage message = new ResponseMessage(
+                "CLEAR_CART_SUCCESSFULLY",
+                "Clear your cart successfully"
+        );
+        return ResponseEntity.ok(message);
+    }
+
+    @PostMapping("remove")
+    public ResponseEntity<?> remove(
+            HttpServletRequest request,
+            @RequestBody RemoveRequest body
+    ) {
+        User user = (User) request.getAttribute("user");
+        if (user.getCart() == null) {
+            throw new CustomException(
+                    "CART_IS_EMPTY",
+                    "Your cart is empty"
+            );
+        }
+        Optional<Cart> cart = cartRepo.findById(user.getCart().getId());
+        List<Item> items = cart.get().getItem();
+        items.removeIf(item -> item.getBook().getId() == body.getBookId());
+        cartRepo.save(cart.get());
+        ResponseMessage message = new ResponseMessage(
+                "REMOVE_ITEM_SUCCESSFULLY",
+                "Remove item in cart successfully"
+        );
+        return ResponseEntity.ok(message);
+    }
 }
 

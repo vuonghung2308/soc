@@ -14,17 +14,20 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "book")
-public class Book implements Serializable {
+public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private String name;
+
+    @Column(columnDefinition = "LONGTEXT")
     private String description;
+
     private Integer numberOfPage;
     private String publisher;
     @ManyToOne
     private Category category;
-    @ManyToMany
+    @OneToMany
     private List<Rating> rating;
     private Long total;
     private Integer sold;

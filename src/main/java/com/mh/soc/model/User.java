@@ -4,6 +4,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Getter
@@ -12,7 +13,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(
-        name = "user",
+        name = "`user`",
         uniqueConstraints = {
                 @UniqueConstraint(columnNames = "username"),
                 @UniqueConstraint(columnNames = "email")
@@ -24,6 +25,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String fullname;
     private String username;
     private String password;
     private String email;
@@ -38,6 +40,10 @@ public class User {
 
     @OneToOne
     private Cart cart;
+    @OneToMany
+    private List<Order> order;
+    @OneToMany
+    private List<Shipment> shipment;
 
     public boolean isCodeValid() {
         long duration = 5 * 60 * 1000;

@@ -8,6 +8,7 @@ import lombok.Getter;
 @Builder
 public class SignInResponse {
     private final Long id;
+    private final String fullname;
     private final String username;
     private final String email;
     private final String token;

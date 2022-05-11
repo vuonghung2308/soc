@@ -1,28 +1,36 @@
 package com.mh.soc.vo.response;
 
-import com.mh.soc.model.Cart;
 import com.mh.soc.model.Item;
+import com.mh.soc.model.Order;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-@Setter
 @AllArgsConstructor
-public class CartResponse {
+public class OrderDetailResponse {
     private Long id;
+    private String code;
     private Long totalPrice;
     private Integer totalQuantity;
+    private String createdTime;
+    private Order.Status status;
     private List<BookResponse> items;
+    private ShipmentResponse shipment;
 
-    public CartResponse(Cart c) {
+    private static final SimpleDateFormat f =
+            new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+    public OrderDetailResponse(Order o) {
         items = new ArrayList<>();
-        totalPrice = 0L;
+        id = o.getId();
+        code = String.valueOf(id + 3000);
         totalQuantity = 0;
-        for (Item item : c.getItem()) {
+        totalPrice = 0L;
+        for (Item item : o.getItem()) {
             BookResponse b = new BookResponse(
                     item.getBook(), item.getQuantity());
             totalQuantity += item.getQuantity();
@@ -30,6 +38,8 @@ public class CartResponse {
                     item.getBook().getPrice();
             items.add(b);
         }
-        id = c.getId();
+        shipment = new ShipmentResponse(o.getShipment());
+        createdTime = f.format(o.getCreatedTime());
+        status = o.getStatus();
     }
 }
