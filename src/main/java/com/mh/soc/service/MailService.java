@@ -1,4 +1,4 @@
-package com.mh.soc.utils;
+package com.mh.soc.service;
 
 import com.mh.soc.model.Order;
 import com.mh.soc.model.User;
@@ -43,16 +43,18 @@ public class MailService {
         return send(to, subject, msg1, msg2) ? code : null;
     }
 
-    public void sendOrderInfo(Order order, User user, User client) {
+    public void sendOrderInfo(Order order, User user, String email) {
         String subject = "Đơn hàng #" + (3000 + order.getId());
         String msg1 = "Thông tin về đơn hàng #" + (3000 + order.getId());
         String msg2;
         if (user.getRole() == User.Role.CUSTOMER) {
-            msg2 = "Bạn đã hủy đơn hàng thành công!.";
-        } else {
             if (order.getStatus() == Order.Status.INITIATED) {
                 msg2 = "Đơn hàng của bạn đã khởi tạo thành công.";
-            } else if (order.getStatus() == Order.Status.CANCELED) {
+            } else {
+                msg2 = "Bạn đã hủy đơn hàng thành công!.";
+            }
+        } else {
+            if (order.getStatus() == Order.Status.CANCELED) {
                 msg2 = "Đơn hàng của bạn đã bị hủy";
             } else if (order.getStatus() == Order.Status.CONFIRMED) {
                 msg2 = "Đơn hàng của bạn đã được đặt thành công và đang được vận chuyển.";
@@ -60,6 +62,6 @@ public class MailService {
                 msg2 = "Đơn hàng của bạn đã giao hàng thành công.";
             }
         }
-        send(client.getEmail(), subject, msg1, msg2);
+        send(email, subject, msg1, msg2);
     }
 }

@@ -9,7 +9,8 @@ import com.mh.soc.repository.CartRepository;
 import com.mh.soc.repository.OrderRepository;
 import com.mh.soc.repository.ShipmentRepository;
 import com.mh.soc.repository.UserRepository;
-import com.mh.soc.utils.MailService;
+import com.mh.soc.service.MailService;
+import com.mh.soc.service.NotificationService;
 import com.mh.soc.vo.request.MakeOrderRequest;
 import com.mh.soc.vo.request.UpdateOrderRequest;
 import com.mh.soc.vo.response.OrderDetailResponse;
@@ -36,7 +37,9 @@ public class OrderController {
     @Autowired
     private UserRepository userRepo;
     @Autowired
-    private MailService service;
+    private MailService mService;
+    @Autowired
+    private NotificationService nService;
 
     @PostMapping("make")
     public ResponseEntity<?> makeOrder(
@@ -73,6 +76,16 @@ public class OrderController {
             user.setOrder(orders);
             user.setCart(cart);
             userRepo.save(user);
+
+            User client = userRepo.getById(orderRepo.getUserId(order.getId()));
+            String email = client.getEmail();
+            String token = client.getToken();
+
+            new Thread(() -> {
+                mService.sendOrderInfo(order, user, email);
+                nService.sendOrderInfo(order, user, token);
+            }).start();
+
             ResponseMessage message = new ResponseMessage(
                     "CREATED_ORDER_SUCCESSFULLY",
                     "You created order successfully"
@@ -137,7 +150,12 @@ public class OrderController {
                 );
         User client = userRepo.getById(orderRepo.getUserId(order.getId()));
         order.setStatus(body.getStatus());
-        service.sendOrderInfo(order, user, client);
+        String email = client.getEmail();
+        String token = client.getToken();
+        new Thread(() -> {
+            mService.sendOrderInfo(order, user, email);
+            nService.sendOrderInfo(order, user, token);
+        }).start();
         orderRepo.save(order);
         ResponseMessage message = new ResponseMessage(
                 "UPDATE_ORDER_SUCCESSFULLY",

@@ -7,8 +7,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SignInRequest {
-    private String username;
-    private String password;
-    private String token;
+public class CommentRequest {
+    private Long bookId;
+    private Integer star;
+    private String comment;
 }

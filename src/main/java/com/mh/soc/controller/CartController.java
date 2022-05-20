@@ -96,6 +96,49 @@ public class CartController {
         }
     }
 
+    @PostMapping("update")
+    public ResponseEntity<?> update(
+            HttpServletRequest request,
+            @RequestBody AddToCartRequest body
+    ) {
+        Book book = bookRepo.findById(body.getBookId())
+                .orElseThrow(() -> new CustomException(
+                        "BOOK_NOT_EXIST",
+                        "Book has id: " + body.getBookId() + " is not exist")
+                );
+        User user = (User) request.getAttribute("user");
+
+        if (user.getCart() == null) {
+            throw new CustomException(
+                    "CART_IS_EMPTY",
+                    "Your cart is empty"
+            );
+        } else {
+            Optional<Cart> cart = cartRepo.findById(user.getCart().getId());
+            boolean hasItem = false;
+            for (Item item : cart.get().getItem()) {
+                if (item.getBook().getId() == body.getBookId()) {
+                    hasItem = true;
+                    item.setQuantity(body.getQuantity());
+                    itemRepo.save(item);
+                    cartRepo.save(cart.get());
+                    break;
+                }
+            }
+            if (!hasItem) {
+                throw new CustomException(
+                        "ITEM_NOT_FOUND",
+                        "Can not find item has bookId" + body.getBookId()
+                );
+            }
+            ResponseMessage message = new ResponseMessage(
+                    "ADD_TO_CART_SUCCESSFULLY",
+                    "Add book to cart successfully"
+            );
+            return ResponseEntity.ok(message);
+        }
+    }
+
     @PostMapping("clear")
     public ResponseEntity<?> clear(HttpServletRequest request) {
         User user = (User) request.getAttribute("user");

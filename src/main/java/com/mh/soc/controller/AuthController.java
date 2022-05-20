@@ -5,7 +5,7 @@ import com.mh.soc.interceptor.CustomException;
 import com.mh.soc.model.User;
 import com.mh.soc.repository.UserRepository;
 import com.mh.soc.utils.JwtUtils;
-import com.mh.soc.utils.MailService;
+import com.mh.soc.service.MailService;
 import com.mh.soc.utils.PasswordEncoder;
 import com.mh.soc.vo.request.SignInRequest;
 import com.mh.soc.vo.request.SignUpRequest;
@@ -48,6 +48,8 @@ public class AuthController {
                         "your email is not verified"
                 );
             }
+            user.setToken(body.getToken());
+            userRepo.save(user);
 
             SignInResponse response = SignInResponse.builder()
                     .id(user.getId()).username(user.getUsername())

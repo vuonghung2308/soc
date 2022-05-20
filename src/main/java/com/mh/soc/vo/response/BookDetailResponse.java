@@ -19,6 +19,7 @@ public class BookDetailResponse {
     private final Float star;
     private final Long price;
     private final String author;
+    private final Integer totalRating;
     private final CategoryResponse category;
     private final List<RatingResponse> ratings;
 
@@ -28,6 +29,7 @@ public class BookDetailResponse {
     public BookDetailResponse(Book b) {
         category = new CategoryResponse(b.getCategory());
         ratings = RatingResponse.get(b.getRating());
+        totalRating = b.getRating().size();
         numberOfPage = b.getNumberOfPage();
         description = b.getDescription();
         publisher = b.getPublisher();

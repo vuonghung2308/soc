@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -58,6 +59,8 @@ public class Book {
         this.author = author;
     }
 
+    private static final DecimalFormat df = new DecimalFormat("0.0");
+
     public Float getStar() {
         if (rating.isEmpty()) {
             return 0F;
@@ -66,6 +69,7 @@ public class Book {
         for (Rating r : rating) {
             result += r.getStar();
         }
-        return result / rating.size();
+        result /= rating.size();
+        return Float.parseFloat(df.format(result));
     }
 }

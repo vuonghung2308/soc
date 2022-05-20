@@ -32,7 +32,7 @@ public class Application implements WebMvcConfigurer {
                 .addPathPatterns("/api/book/create")
                 .addPathPatterns("/api/book/update")
                 .addPathPatterns("/api/book/delete")
-                .addPathPatterns("/api/order/update")
+                .addPathPatterns("/api/book/comment")
                 .addPathPatterns("/api/order/**")
                 .addPathPatterns("/api/cart/**");
     }

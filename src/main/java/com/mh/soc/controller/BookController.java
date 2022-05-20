@@ -1,14 +1,12 @@
 package com.mh.soc.controller;
 
 import com.mh.soc.interceptor.CustomException;
-import com.mh.soc.model.Book;
-import com.mh.soc.model.Category;
-import com.mh.soc.model.File;
-import com.mh.soc.model.User;
+import com.mh.soc.model.*;
 import com.mh.soc.repository.BookRepository;
 import com.mh.soc.repository.CategoryRepository;
 import com.mh.soc.repository.FileRepository;
-import com.mh.soc.utils.MailService;
+import com.mh.soc.repository.RatingRepository;
+import com.mh.soc.vo.request.CommentRequest;
 import com.mh.soc.vo.response.BaseBookResponse;
 import com.mh.soc.vo.response.BookDetailResponse;
 import com.mh.soc.vo.response.BookResponse;
@@ -36,6 +34,8 @@ public class BookController {
     private FileRepository fileRepo;
     @Autowired
     private CategoryRepository categoryRepo;
+    @Autowired
+    private RatingRepository ratingRepo;
 
     private static final SimpleDateFormat format =
             new SimpleDateFormat("yyyy-MM-dd");
@@ -95,6 +95,12 @@ public class BookController {
                 )
         );
         return ResponseEntity.ok(new BookDetailResponse(book));
+    }
+
+    @GetMapping("by-category")
+    public ResponseEntity<?> getByCategory(@RequestParam Long id) {
+        List<Book> list = bookRepo.findByCategory_Id(id);
+        return ResponseEntity.ok(BookResponse.get(list));
     }
 
     @PostMapping("create")
@@ -260,6 +266,40 @@ public class BookController {
         ResponseMessage message = new ResponseMessage(
                 "DELETE_SUCCESSFULLY",
                 "Delete book has id: " + id + " successfully"
+        );
+        return ResponseEntity.ok(message);
+    }
+
+    @PostMapping("comment")
+    public ResponseEntity<?> comment(
+            @RequestBody CommentRequest body,
+            HttpServletRequest request
+    ) {
+        User user = (User) request.getAttribute("user");
+        Book book = bookRepo.findById(body.getBookId()).orElseThrow(() ->
+                new CustomException(
+                        "BOOK_NOT_FOUND",
+                        "Can not find book has id:" + body.getBookId()
+                )
+        );
+        Long ratingId = ratingRepo.getRatingId(user.getId(), book.getId());
+        Rating rating = new Rating();
+        if (ratingId != null) {
+            rating = ratingRepo.findById(ratingId)
+                    .orElse(new Rating());
+        }
+        rating.setComment(body.getComment());
+        rating.setStar(body.getStar());
+        rating.setUser(user);
+        if (rating.getId() == null) {
+            book.getRating().add(rating);
+        }
+        ratingRepo.save(rating);
+        bookRepo.save(book);
+        ResponseMessage message = new ResponseMessage(
+                "POST_SUCCESSFULLY",
+                "Post comment for book has id: " +
+                        body.getBookId() + " successfully"
         );
         return ResponseEntity.ok(message);
     }
